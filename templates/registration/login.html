@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Вход - EduPortal{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-card">
+        <div class="auth-header">
+            <img src="{% static 'images/logo1.webp' %}" alt="Logo" class="auth-logo">
+            <h1>Вход в систему</h1>
+            <p>Войдите, чтобы управлять своими заявками</p>
+        </div>
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label }}">Логин</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <div class="form-error">{{ form.username.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.password.id_for_label }}">Пароль</label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                    <div class="form-error">{{ form.password.errors }}</div>
+                {% endif %}
+            </div>
+
+            {% if form.non_field_errors %}
+                <div class="form-error">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <button type="submit" class="btn btn--primary btn--full">Войти</button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Ещё не зарегистрированы? <a href="{% url 'register' %}">Регистрация</a></p>
+        </div>
+    </div>
+
+    <div class="auth-image">
+        <img src="{% static 'images/image06.jpg' %}" alt="Образовательная организация" class="auth-bg-img">
+    </div>
+</div>
+{% endblock %}

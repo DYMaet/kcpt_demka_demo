@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Оставить отзыв - EduPortal{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <div class="form-card">
+        <div class="form-header">
+            <h1>Отзыв о курсе</h1>
+            <p>Курс: <strong>{{ application.course_name }}</strong></p>
+        </div>
+
+        <form method="post" class="app-form">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label>Ваша оценка <span class="required">*</span></label>
+                {{ form.rating }}
+                {% if form.rating.errors %}
+                    <div class="form-error">{{ form.rating.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.comment.id_for_label }}">Комментарий (необязательно)</label>
+                {{ form.comment }}
+                {% if form.comment.errors %}
+                    <div class="form-error">{{ form.comment.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'dashboard' %}" class="btn btn--secondary">Отмена</a>
+                <button type="submit" class="btn btn--primary">Отправить отзыв</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="form-sidebar">
+        <img src="{% static 'images/image08.webp' %}" alt="Отзывы" class="sidebar-img">
+        <div class="info-box">
+            <h3>Ваше мнение важно</h3>
+            <p>Отзывы помогают нам улучшать качество образовательных услуг и помогают другим студентам сделать правильный выбор.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

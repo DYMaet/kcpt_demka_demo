@@ -1,0 +1,81 @@
+{% load static %}
+{% comment %} load static нужна для всяких картинок и жс\ксс {% endcomment %}
+{% comment %} 
+    Это самый базовый основной базированный фундаментальный шаблон 
+    тут указываются основные компоненты типа
+    Навигационная панель, футер, 
+    возможно шаблоны для алёртов\сообщений,
+    сюда же подгружается яваскрипт и ксска.
+    Также по дефолту без участия views доступны переменные user и messages.
+    т.е. юзера и сообщения передавать в контексте не надо, они передаются сами
+
+{% endcomment %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Образовательный портал{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container header__inner">
+            <!-- Данные в {} получаем из urls.py -->
+            <a href="{% url 'dashboard' %}" class="logo">
+                <!-- А тут static - это как раз подгруженная в load static папка static (путь к ней в настройках) со всякой статикой типа яваскрипта\ксс и картинок -->
+                <img src="{% static 'images/logo1.webp' %}" alt="Logo" class="logo__img">
+                <span class="logo__text">EduPortal</span>
+            </a>
+            <nav class="nav">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard' %}" class="nav__link">Мои заявки</a>
+                    <a href="{% url 'create_application' %}" class="nav__link">Новая заявка</a>
+                    <!-- Проверка на админку, если админ - добавляем кнопочку с админ панелью. По-сути не обязательно, админу можно и по ссылке вручную переходить -->
+                    {% if user.is_superuser or user.username == 'Admin' %} 
+                        <a href="{% url 'admin_panel' %}" class="nav__link nav__link--admin">Админ панель</a>
+                    {% endif %}
+                    <!-- Также если юзер авторизирован пихаем кнопку выхода вместо входа\регистрации -->
+                    {% comment %} Кнопка выхода работает через method="post", кстати. {% endcomment %}
+                    <form action="{% url 'logout' %}" method="post" class="nav__logout">
+                        <!-- в формы ВСЕГДА пихаем csrf_token -->
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn--ghost">Выйти ({{ user.username }})</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn--ghost">Войти</a>
+                    <a href="{% url 'register' %}" class="btn btn--primary">Регистрация</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <!-- Если есть сообщения - показываем алёрты. По критериям вроде нужно -->
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="alert alert--{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+                <!-- В block content  будет пихаться контент из остальных шаблонов. Не забудьте про него-->
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 EduPortal. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/main.js' %}"></script>
+    <!-- На всякий случай если нужен будет ещё жыэс в других шаблонах -->
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% comment %} Наследуемся от base.html {% endcomment %}
+{% load static %}
+
+{% comment %} Тут переопределение названия страницы {% endcomment %}
+{% block title %}Мои заявки - EduPortal{% endblock %}
+
+{% comment %} Тут обязателен block content. Именно он будет встраиваться в block content в base.html {% endcomment %}
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1>Мои заявки</h1>
+        {% comment %} По названию из urls.py {% endcomment %}
+        <a href="{% url 'create_application' %}" class="btn btn--primary">Создать новую заявку</a>
+    </div>
+    {% comment %} Берётся как раз из контекста {% endcomment %}
+    {% if applications %}
+        <div class="applications-list">
+            {% for app in applications %}
+            <article class="application-card">
+                <div class="application-header">
+                    <h3>{{ app.course_name }}</h3>
+                    <span class="badge badge--{{ app.status }}">{{ app.get_status_display }}</span>
+                </div>
+                <div class="application-details">
+                    <div class="detail">
+                        <strong>Дата создания:</strong> {{ app.created_at|date:"d.m.Y H:i" }}
+                    </div>
+                    <div class="detail">
+                        <strong>Желаемая дата начала:</strong> {{ app.desired_start_date|date:"d.m.Y" }}
+                    </div>
+                    <div class="detail">
+                        <strong>Способ оплаты:</strong> {{ app.get_payment_method_display }}
+                    </div>
+                </div>
+                {% if app.status == 'completed' and app.id not in reviewed_application_ids %}
+                <div class="application-actions">
+                    <a href="{% url 'create_review' app.id %}" class="btn btn--secondary">Оставить отзыв</a>
+                </div>
+                {% endif %}
+            </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            {% comment %} Подргузка картинок vvv {% endcomment %}
+            <img src="{% static 'images/graphic1.png' %}" alt="Нет заявок" class="empty-img">
+            <h2>У вас пока нет заявок</h2>
+            <p>Создайте первую заявку на обучение, нажав кнопку выше</p>
+            <a href="{% url 'create_application' %}" class="btn btn--primary">Создать заявку</a>
+        </div>
+    {% endif %}
+        {% comment %} Тут логика карточек отзывов + закраска звёздочек в зависимости от поставленного рейтинга. Можно придумать че-нибудь по проще {% endcomment %}
+    {% if reviews %}
+    <section class="reviews-section">
+        <h2>Мои отзывы</h2>
+        <div class="reviews-list">
+            {% for review in reviews %}
+            <article class="review-card">
+                <div class="review-header">
+                    <h4>{{ review.application.course_name }}</h4>
+                    <div class="rating">
+                        {% for i in "12345"|make_list %}
+                            <span class="star {% if forloop.counter <= review.rating %}filled{% endif %}">★</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% if review.comment %}
+                <p class="review-comment">{{ review.comment }}</p>
+                {% endif %}
+                <small class="review-date">{{ review.created_at|date:"d.m.Y" }}</small>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}
